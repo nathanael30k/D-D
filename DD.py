@@ -155,40 +155,8 @@ crit_mult = 3
 bonus_dégat = 3
 IsTwoHanded = True
 
-#Coutille = Arme(10,1,3,0,0,True)
-#Ezychiel = Guerrier(level,force,bba,bonus_att,bonus_dégat,Coutille)
-#Ezychiel.opti_attpuiss()
-#
-#
-A = distrib_att(16,22,1,3,10,10)
-plt.plot(A)
-B = distrib_att(11,22,1,3,10,10)
-#plt.figure()
-##plt.plot(Somme_distrib(A,B))
-#
-#attaque = ((2*d4)+4)
-#print(attaque.expected())
-#attaque += 1*d6
-#print(attaque.expected())
-#print(attaque.table)
-#attaque.dice_distrib().show()
-#print(attaque.dice_distrib().check())
-#attaque.dice_distrib().show()
-#a = distrib(1,1)
-#a.show()
-#b = distrib(3,4)
-#b.show()
-#(a+b).show()
-##print(attaque.roll())
-##print(attaque.roll())
-##print(attaque.roll())
-##print(attaque.roll())
-#
-#print(type(d6))
-#test = distrib(2,4)
-#test.show()
-#test+=2*test
-#test.show()
-#test = distrib(2,4)
-#test.show()
-#print(test.roll())
+distrib_touche = bernouilli(Ptouche(8,15))
+distrib_crit = (2*bernouilli(Pcrit(2)))+1
+distrib_tot = (distrib_crit*distrib_touche*(d10+3).dice_distrib())
+(distrib_tot+distrib_tot).show()
+#Ptouche(att,CA) * (1 + Pcrit(crit_size)*(crit_mult-1)) * Esp_dégat(dé_arme,bonus_dégat)
