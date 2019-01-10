@@ -4,13 +4,13 @@ Created on Wed Dec 26 23:35:19 2018
 
 @author: Nessim
 """
-
+import numpy as np
 import matplotlib.pyplot as plt
 
 class distrib:
     
     def __init__(self,min,max):
-        self.proba=[0]*(min-1)+[1/(max-min+1)]*(max-min+1)
+        self.proba=[0]*(min)+[1/(max-min+1)]*(max-min+1)
         
     def check(self):
         return sum(self.proba)
@@ -66,6 +66,8 @@ class distrib:
         output = distrib(0,index_max-1)
         output.proba = C
         return output
+    def roll(self):
+        return np.random.choice(len(self.proba),p=self.proba)
     
     
     def show(self):
