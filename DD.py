@@ -6,7 +6,7 @@ Created on Tue Dec 25 19:52:55 2018
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from RPG.dice import *
+from dice import *
 
 
 

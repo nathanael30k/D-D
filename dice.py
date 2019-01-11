@@ -8,6 +8,8 @@ Created on Wed Dec 26 22:29:54 2018
 import numpy as np
 from random import randint
 import matplotlib.pyplot as plt
+
+# Class
     
 class distrib:
     
@@ -44,8 +46,6 @@ class distrib:
             for i in range(len(proba1)):
                 probatemp = (i*x).proba
                 probatemp.extend([0.] * (index_max+1 - len(probatemp)))
-                print(proba1[i])
-                print(probatemp)
                 output += float(proba1[i])*np.array(probatemp)
             return distrib(list(output))
             
@@ -97,8 +97,10 @@ class distrib:
         return self.__add__(x)
     
     def roll(self):
-        return np.random.choice(len(self.proba),p=self.proba)
-    
+        if 1-self.check()>0.01:
+            self.proba[0]+=1-self.check()
+            return np.random.choice(len(self.proba),p=self.proba)
+        return 666
     
     def show(self):
         plt.figure()
@@ -154,8 +156,12 @@ class dice:
                 output =output +distrib([0]+[1/dice[i+1]]*dice[i+1])
         return output
 
+# Methods
+
 def bernouilli(p):
     return distrib([1-p,p])
+
+# Base de données
 
 d4 = dice([0,1,0,0,0,0,0,0])
 d6 = dice([0,0,1,0,0,0,0,0])
