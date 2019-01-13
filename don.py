@@ -9,7 +9,8 @@ def science_de_l_initiative(joueur):
     joueur.init += 4 
     
 def robustesse(joueur):
-    joueur.pv_max +=3    
+    joueur.pv_max += 3
+    joueur.pv += 3    
 
 def arme_de_predilection(joueur):
     joueur.bonus_att += 1

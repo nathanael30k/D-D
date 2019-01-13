@@ -14,8 +14,14 @@ from joueur import *
 from duel import duel_screen
 import time as time
 from don import *
+import pickle
+
 
 list_don = list_don_static + list_don_arme
+
+data_joueur = open("liste_joueur.pickle","rb")
+list_joueur = pickle.load(data_joueur)
+data_joueur.close()
 
 def menu():
     fenetre = Tk()
@@ -271,6 +277,9 @@ def valider_choix(listbox,index,fenetre,name,classe,level,force,dex,con,intel,sa
     
 def ajouter_liste(fenetre,joueur):
     list_joueur.append(joueur)
+    data_joueur = open("liste_joueur.pickle","wb")
+    pickle.dump(list_joueur,data_joueur)
+    data_joueur.close()
     fenetre.destroy()
     
         

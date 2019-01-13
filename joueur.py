@@ -11,6 +11,7 @@ from armure import *
 from bouclier import *
 from don import *
 from classe import *
+import pickle
 
 def modif(n):
     return int(np.floor((n-10)/2))
@@ -102,4 +103,4 @@ list_joueur = [HobJason,HobJason2]
                   #[science_de_l_initiative],[[arme_de_predilection,épéeBatarde]])
 #print(HobJason)
 
-#♠Ogre = Joueur("L'Ogre",8,8,7,16,29,massue,[])
+#Ogre = Joueur("L'Ogre",8,8,7,16,29,massue
