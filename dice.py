@@ -5,6 +5,16 @@ Created on Wed Dec 26 22:29:54 2018
 @author: Nessim
 """
 
+# ================= V0 ========================
+
+# A faire:
+# rajouter fonction "max()" à dice et distrib
+#       renvoie la valeur maximum du tirage
+# rajouter fonction "sup(x)" à dice et distrib
+#      renvoie la proba d'avoir un tirage supérieur à x 
+# rajouter fonction "inf(x)" à dice et distrib
+#      renvoie la proba d'avoir un tirage inférieur à x 
+
 import numpy as np
 from random import randint
 import matplotlib.pyplot as plt
@@ -115,7 +125,6 @@ class distrib:
 class dice:
     def __init__(self,table):
         self.table = np.array(table)
-        
     def __add__(self,other):
         if type(self)==type(other):
             return dice(self.table+other.table)
@@ -132,6 +141,19 @@ class dice:
     
     def __rmul__(self,x):
         return dice(x*self.table)
+    
+    def __str__(self):
+        name = ""
+        dice = [0,"d4","d6","d8","d10","d12","d20","d100"]
+        for i in range(7):
+            if self.table[i+1] != 0:
+                name += str(self.table[i+1])+dice[i+1]+"+"
+        if self.table[0]==0:
+            name = name[:-1]
+        else:
+            name += str(self.table[0])
+        return name
+        
     
     def roll(self):
         result = 0
