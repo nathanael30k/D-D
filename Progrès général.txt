@@ -1,0 +1,19 @@
+fichier		état	test	comment	lignes
+
+dice		OK	OK	bof	225
+arme 		OK	OK	OK	113 
+effet_arme	OK	OK	OK	44
+armure		OK	OK	bof	64
+bouclier	OK	OK	bof	50
+don		OK	OK		127
+joueur					170
+database		OK	OK	56
+duel			OK		182
+gui_pointbuy 				63
+gui_perso_general			53
+gui_don					75
+gui_créer_perso				142
+gui_attaque				15
+GUI					380
+
+					1759

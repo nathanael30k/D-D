@@ -7,21 +7,116 @@ Created on Sat Jan 12 18:26:27 2019
 
 from tkinter import *
 from classe import list_classe
-from armure import list_armure
-from arme import list_arme
-from bouclier import list_bouclier
+
+from database import list_arme,list_armure,list_bouclier
+
 from joueur import *
 from duel import duel_screen
 import time as time
 from don import *
 import pickle
+from database import *
 
 
 list_don = list_don_static + list_don_arme
 
 data_joueur = open("liste_joueur.pickle","rb")
-list_joueur = pickle.load(data_joueur)
+#list_joueur = pickle.load(data_joueur)
 data_joueur.close()
+
+def update_gui_arme(widgetvar_list):
+    choix_effet = []
+    if len(widgetvar_list)==12:
+        effet = list(widgetvar_list[10].curselection())
+    
+        for i in range(len(effet)):
+            choix_effet += [list_effet_arme[effet[i]]]
+    #    if len(widgetvar_list)>0:        
+    #        print(widgetvar_list[0].get())
+        arme = Arme(widgetvar_list[0].get(),int(widgetvar_list[1].get()),\
+                    int(widgetvar_list[2].get()),int(widgetvar_list[3].get()),\
+                    int(widgetvar_list[4].get()),\
+                    bool(widgetvar_list[7].get()),bool(widgetvar_list[8].get()),\
+                    bool(widgetvar_list[9].get()),\
+                     int(widgetvar_list[5].get()),choix_effet,\
+                     int(widgetvar_list[6].get()))
+        widgetvar_list[11].set(arme.prix_achat())
+    return True
+
+def gui_new_arme():
+    
+    gui_arme = Tk()
+    
+    nom_variable = ["Nom: ","id: ","dé degat: ","Taille de la zone de critique :",\
+     "Multiplicateur de critique","bonus magique: ","prix de base"]
+    valeur_defaut = ["Nom",0,6,1,2,0,0]
+    widgetvar_list = []
+    
+    for i in range(7):
+        var=StringVar()
+        Label(gui_arme,text=nom_variable[i]).grid(row=i+1,column=1)
+        entry = Entry(gui_arme,width=15,textvariable=var,validate = 'key',validatecommand=\
+                 lambda: update_gui_arme(widgetvar_list))
+        var.set(str(valeur_defaut[i]))
+        entry.grid(row=i+1,column=2)
+        widgetvar_list.append(var)
+    
+    isTwoHanded = IntVar()
+    twoHand = Checkbutton(gui_arme,text = "arme légère",variable = isTwoHanded,\
+                          command = update_gui_arme(widgetvar_list))
+    twoHand.grid(row = 9, column = 1)
+    widgetvar_list.append(isTwoHanded)
+    
+    isLight = IntVar()
+    light = Checkbutton(gui_arme,text = "à deux mains",variable = isLight,\
+                          command = update_gui_arme(widgetvar_list))
+    light.grid(row = 10, column = 1)
+    widgetvar_list.append(isLight)
+    
+    deMaitre = IntVar()
+    maitre = Checkbutton(gui_arme,text = "de maitre",variable = deMaitre,\
+                          command = update_gui_arme(widgetvar_list))
+    maitre.grid(row = 11, column = 2)
+    widgetvar_list.append(deMaitre)
+ 
+    
+    choix_effet =Listbox(gui_arme, width=20,height=8,\
+                         selectmode='multiple',exportselection=0)
+    
+    for i in range(len(list_effet_arme)):
+        choix_effet.insert(END,list_nom_effet_arme[i])
+    choix_effet.grid(row=1,column=3,rowspan=12) 
+    widgetvar_list.append(choix_effet)
+    
+    last=StringVar()
+    labelultime= Label(gui_arme, text = "prix: 0po",textvariable=last)
+    widgetvar_list.append(last)
+    labelultime.grid(row=11,column=3)
+    
+    bouton=Button(gui_arme, text="Créer arme", command=\
+                  lambda: gui_valid_arme(widgetvar_list,gui_arme))
+    bouton.grid(row=8,column=3)
+       
+    gui_arme.mainloop()
+    
+    
+
+def validtest(a):
+    print(a)
+    return True
+    
+def test():
+    print("ou?")
+    fenetre = Tk()
+    
+    # name
+    label = Label(fenetre, text="Nom:")
+    label.grid(row=2,column=1)
+    name = Entry(fenetre, width=15,validate = 'key',validatecommand=\
+                 lambda: validtest(3))
+    name.insert(END,"Nom")
+    name.grid(row=2,column=2)
+    fenetre.mainloop()
 
 def menu():
     fenetre = Tk()
@@ -172,7 +267,7 @@ def création_perso():
     Label(fenetre, text="Arme:").grid(row=11,column=1)
     choix_arme=Listbox(fenetre, width=15,height=1,exportselection=0)
     for i in range(len(list_arme)):
-        choix_arme.insert(END,list_arme[i].name)
+        choix_arme.insert(END,list_arme[i].nom)
     choix_arme.selectmode ='single'
     choix_arme.selection_set(0)
     choix_arme.grid(row=11,column=2)
@@ -181,7 +276,7 @@ def création_perso():
     Label(fenetre, text="Armure:").grid(row=12,column=1)
     choix_armure=Listbox(fenetre, width=15,height=1,exportselection=0)
     for i in range(len(list_armure)):
-        choix_armure.insert(END,list_armure[i].name)
+        choix_armure.insert(END,list_armure[i].nom)
     choix_armure.selectmode ='single'
     choix_armure.selection_set(0)
     choix_armure.grid(row=12,column=2)
@@ -190,7 +285,7 @@ def création_perso():
     Label(fenetre, text="bouclier:").grid(row=13,column=1)
     choix_bouclier=Listbox(fenetre, width=15,height=1,exportselection=0)
     for i in range(len(list_bouclier)):
-        choix_bouclier.insert(END,list_bouclier[i].name)
+        choix_bouclier.insert(END,list_bouclier[i].nom)
     choix_bouclier.selectmode ='single'
     choix_bouclier.selection_set(0)
     choix_bouclier.grid(row=13,column=2)
@@ -282,5 +377,5 @@ def ajouter_liste(fenetre,joueur):
     data_joueur.close()
     fenetre.destroy()
     
-        
+#gui_new_arme()    
 menu()

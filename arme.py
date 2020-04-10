@@ -5,33 +5,49 @@ Created on Thu Jan 10 21:23:09 2019
 @author: Nessim
 """
 
-# ================= V0 ========================
-# ==============Completer database=============
 
-from dice import *
-from copy import *
+# ==================================V0=========================================
+# Ne prend pas en compte les différents types de dégats
+# Seulement arme de corps à corps sans allonge
+# =============================================================================
 
 
+from copy import deepcopy
+
+
+# =============================================================================
 # Class
+# =============================================================================
 
 class Arme:
-    def __init__(self,name,id,dé_degat,crit_size,crit_mult,IsTwoHanded,maitre,\
-                 bonus_magique,effet_magique,prix_base):
+    
+    def __init__(self,nom,id,dé_degat,crit_size,crit_mult,IsTwoHanded,IsLight,\
+                 maitre,bonus_magique,effet_magique,prix_base):
         
-        self.name = name
-        self.id = id
-        self.prix_base = prix_base
+        self.nom = nom
+        
+        self.id = id #id correspondant à l'arme de base
+        
         self.dé_arme = dé_degat+ bonus_magique
-        self.crit_size = crit_size
-        self.crit_mult = crit_mult
-        self.bonus_att = int(maitre)+ bonus_magique
-        self.IsTwoHanded = IsTwoHanded
-        self.maitre = maitre
-        self.bonus_magique = bonus_magique
         
-        self.modif_magie = bonus_magique
-        for i in range(len(effet_magique)):
-            effet_magique[i](self)
+        self.crit_size = crit_size #taille de la zone de critique
+        self.crit_mult = crit_mult
+        
+        self.IsTwoHanded = IsTwoHanded
+        self.IsLight = IsLight
+        
+        self.bonus_att = max(int(maitre),bonus_magique)
+
+        self.maitre = maitre
+        self.bonus_magique = bonus_magique    
+        self.modif_magie = bonus_magique #modif magique du prix
+         
+        for i in range(len(effet_magique)): 
+            #application de tous les effets magiques
+            effet_magique[i].effet(self)
+            
+        self.prix_base = prix_base
+        
         
     def p_crit(self):
         # Cette fonction renvoie la probabilité qu'une attaque réussie soit un
@@ -39,9 +55,45 @@ class Arme:
         # crit_size = taille de la zone de critique
         #ex: critique en 19-20 => crit_size = 2
         return self.crit_size/20
+        
     
+    def set_magic(self,nom,bonus_magique,effet_magique):
+        # renvoie une NOUVELLE arme, dotée des mêmes caractéristiques que \
+        #l'arme de base, mais avec les effets magiques/bonus d'altération en \
+        #argument
+        
+        output = deepcopy(self.de_maitre()) #génération de la nouvelle arme
+        
+        #ajout des propriétés magiques
+        output.nom = nom
+        output.bonus_magique = bonus_magique
+        output.effet_magique = effet_magique
+        
+        #recalcul des carac de l'arme
+        output.dé_arme = output.dé_arme+ output.bonus_magique
+        output.bonus_att = max(int(self.maitre),bonus_magique)
+        
+        #application des effets magiques
+        for i in range(len(effet_magique)):
+            effet_magique[i].effet(output)
+        return output
+    
+    def de_maitre(self):
+        # renvoie une NOUVELLE arme, dotée des mêmes caractéristiques que \
+        #l'arme de base, mais de maitre
+        
+        output = deepcopy(self) #genere nouvelle arme
+        output.maitre = True #ajout de la propriété maitre
+        
+        #recalcul des carac de l'arme
+        output.bonus_att = int(output.maitre)+ output.bonus_magique
+        
+        return output
+    
+
     def __str__(self):
-        output = self.name
+        #gère l'affichage de l'arme
+        output = self.nom
         if self.bonus_magique != 0 :
             output += " +"+str(self.bonus_magique)
         elif self.maitre:
@@ -53,51 +105,13 @@ class Arme:
         output += "prix: "+str(self.prix_achat())+"po\n"
         return output
     
-    def add_magic(self,name,bonus_magique,effet_magique):
-        output = deepcopy(self)
-        output.name = name
-        output.bonus_magique = bonus_magique
-        output.effet_magique = effet_magique
-        output.maitre = False
-        
-        output.dé_arme = output.dé_arme+ output.bonus_magique
-        output.bonus_att = int(output.maitre)+ output.bonus_magique
-        
-        for i in range(len(effet_magique)):
-            effet_magique[i](output)
-        return output
-    
-    def de_maitre(self):
-        output = deepcopy(self)
-        output.maitre = True
-        
-        output.bonus_att = int(output.maitre)+ output.bonus_magique
-        
-        return output
     
     def prix_achat(self):
-        prix_magie = [0,2,8,18,32,50,72,98,128,162,200]
-        return self.prix_base+self.maitre*300 + 1000*prix_magie[self.modif_magie]
-        
-    
-# Effet magique
-        
-def feu(arme):
-    arme.dé_arme += d6
-    arme.modif_magie += 1
+        #renvoie le prix d'achat total d'un arme
+        prix_magie = [0,2,8,18,32,50,72,98,128,162,200] #prix du modif en kpo
+        return self.prix_base+self.maitre*300 + \
+                    1000*prix_magie[self.modif_magie]
 
-# Epee de base
-    
-épée_batarde = Arme("épée_batarde",1,d10,2,2,False,False,0,[],35)
 
-# Epee unique/magique
 
-hobJason_sword = épée_batarde.de_maitre()
-fire_sword = épée_batarde.add_magic("firesword",3,[feu])
-
-list_arme=[épée_batarde,fire_sword]
-# Test
-#print(épée_batarde.de_maitre())
-#print(fire_sword)
-#massue = Arme(2*d8,1,2,True,False)
 

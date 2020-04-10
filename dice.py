@@ -5,16 +5,6 @@ Created on Wed Dec 26 22:29:54 2018
 @author: Nessim
 """
 
-# ================= V0 ========================
-
-# A faire:
-# rajouter fonction "max()" à dice et distrib
-#       renvoie la valeur maximum du tirage
-# rajouter fonction "sup(x)" à dice et distrib
-#      renvoie la proba d'avoir un tirage supérieur à x 
-# rajouter fonction "inf(x)" à dice et distrib
-#      renvoie la proba d'avoir un tirage inférieur à x 
-
 import numpy as np
 from random import randint
 import matplotlib.pyplot as plt
@@ -22,15 +12,35 @@ import matplotlib.pyplot as plt
 # Class
     
 class distrib:
+
+    # La classe distrib représente une distribution de probabilité sur les 
+    # entiers naturels.
+    #
+    # Attributs:
+    # - proba: tableau des probabilités associés à chaque nombre entier à partir 
+    #   de 0.
+    #
+    # Méthodes:
+    # - constructeur prenant en argument le tableaux de probabilités.
+    # - redéfinition de la multiplication par un scalaire et entre distributions.
+    # - redéfinition de l'addition par un scalaire et entre distributions.
+    # - check(): retourne la somme des probabilités; doit etre quasi égal à 1.
+    # - max(): renvoie la valeur maximale prise par la variable aléatoire et 
+    #   supprime les zeros inutiles en fin de tableau.
+    # - inf(x): renvoie la probabilité d'obtenir un score inférieur à x (voir 
+    #   commentaire de la fonction pour l'argument facultatif)
+    # - sup(x): renvoie la probabilité d'obtenir un score supérieur à x (voir 
+    #   commentaire de la fonction pour l'argument facultatif)
+    # - expected(): renvoie l'espérence de la variable aléatoire.
+    # - roll(): renvoie le résultat du lancer
+    # - show(): montre le graphique de la distibution de probabilité
+    # - check(): retourne la somme des probabilités; doit etre quasi égal à 1.
     
     def __init__(self,proba):
         self.proba = proba       
-        
-    def check(self):
-        return sum(self.proba)
-    
+
     def __mul__(self,x):
-        
+
         if type(x)== int:
             # la multiplication par un entier x correspond à multiplier le 
             #résultat du tirage par x
@@ -58,13 +68,11 @@ class distrib:
                 probatemp.extend([0.] * (index_max+1 - len(probatemp)))
                 output += float(proba1[i])*np.array(probatemp)
             return distrib(list(output))
-            
-            
+
     def __rmul__(self,x):
         #commutativité du produit
-        return self.__mul__(x)
+        return self.__mul__(x)     
     
-            
     
     def __add__(self,other):
         
@@ -106,6 +114,33 @@ class distrib:
         #commutativité du produit
         return self.__add__(x)
     
+    
+    def max(self):
+        while self.proba[len(self.proba)-1]==0:
+            del self.proba[len(self.proba)-1]
+        return len(self.proba)-1
+    
+    
+    def inf(self,x,equal=False):
+        #proba de faire un score inferieur à x (ou égale si equal = True)
+        output = 0
+        for i in range(x):
+            output += self.proba[i]
+        if equal:
+            output += self.proba[x]
+        return output
+            
+    def sup(self, x, equal = True):
+        #proba de faire un score supérieur à x (ou égale si equal = True)
+        a= not(equal)
+        return 1-self.inf(x,a)
+    
+    def expected(self):
+        expected = 0
+        for i in range(len(self.proba)):
+            expected +=float(i)*self.proba[i]
+        return expected
+    
     def roll(self):
         if 1-self.check()>0.01:
             self.proba[0]+=1-self.check()
@@ -116,25 +151,26 @@ class distrib:
         plt.figure()
         plt.plot(self.proba)
     
-    def expected(self):
-        expected = 0
-        for i in range(len(self.proba)):
-            expected +=float(i)*self.proba[i]
-        return expected
+    def check(self):
+        return sum(self.proba)
+        
+        
 
 class dice:
+    
     def __init__(self,table):
         self.table = np.array(table)
+        
     def __add__(self,other):
         if type(self)==type(other):
             return dice(self.table+other.table)
-        return dice(self.table+[other,0,0,0,0,0,0,0])
+        return dice(self.table+[other,0,0,0,0,0,0,0,0,0])
 
 
     def __radd__(self,other):
         if type(self)==type(other):
             return dice(self.table+other.table)
-        return dice(self.table+[other,0,0,0,0,0,0,0])
+        return dice(self.table+[other,0,0,0,0,0,0,0,0,0])
     
     def __mul__(self,x):
         return dice(x*self.table)
@@ -144,8 +180,8 @@ class dice:
     
     def __str__(self):
         name = ""
-        dice = [0,"d4","d6","d8","d10","d12","d20","d100"]
-        for i in range(7):
+        dice = [0,"d2","d3","d4","d6","d8","d10","d12","d20","d100"]
+        for i in range(9):
             if self.table[i+1] != 0:
                 name += str(self.table[i+1])+dice[i+1]+"+"
         if self.table[0]==0:
@@ -157,26 +193,38 @@ class dice:
     
     def roll(self):
         result = 0
-        dice = [1,4,6,8,10,12,20,100]
-        for i in range(8):
+        dice = [1,2,3,4,6,8,10,12,20,100]
+        for i in range(10):
             for j in range(self.table[i]):
                 result += randint(1,dice[i])
         return result
     
     def expected(self):
         expected = self.table[0]
-        dice = [1,4,6,8,10,12,20,100]
-        for i in range(7):
+        dice = [1,2,3,4,6,8,10,12,20,100]
+        for i in range(9):
             expected +=self.table[i+1]*(dice[i+1]+1)/2
         return expected
     
+    def max(self):
+        return self.dice_distrib().max()
+        
+    
     def dice_distrib(self):
         output = self.table[0]*distrib([0,1])
-        dice = [1,4,6,8,10,12,20,100]
-        for i in range(7):
+        dice = [1,2,3,4,6,8,10,12,20,100]
+        for i in range(9):
             for j in range(self.table[i+1]):
                 output =output +distrib([0]+[1/dice[i+1]]*dice[i+1])
         return output
+    
+    def inf(self,x,equal=False):
+        #proba de faire un score inferieur à x (ou égale si equal = True)
+        return self.dice_distrib().inf(x,equal)
+            
+    def sup(self, x, equal = True):
+        #proba de faire un score supérieur à x (ou égale si equal = True)
+        return self.dice_distrib().sup(x,equal)
 
 # Methods
 
@@ -184,11 +232,12 @@ def bernouilli(p):
     return distrib([1-p,p])
 
 # Base de données
-
-d4 = dice([0,1,0,0,0,0,0,0])
-d6 = dice([0,0,1,0,0,0,0,0])
-d8 = dice([0,0,0,1,0,0,0,0])
-d10 = dice([0,0,0,0,1,0,0,0])
-d12 = dice([0,0,0,0,0,1,0,0])
-d20  = dice([0,0,0,0,0,0,1,0])
-d100  = dice([0,0,0,0,0,0,0,1])
+d2 = dice([0,1,0,0,0,0,0,0,0,0])
+d3 = dice([0,0,1,0,0,0,0,0,0,0])
+d4 = dice([0,0,0,1,0,0,0,0,0,0])
+d6 = dice([0,0,0,0,1,0,0,0,0,0])
+d8 = dice([0,0,0,0,0,1,0,0,0,0])
+d10 = dice([0,0,0,0,0,0,1,0,0,0])
+d12 = dice([0,0,0,0,0,0,0,1,0,0])
+d20  = dice([0,0,0,0,0,0,0,0,1,0])
+d100  = dice([0,0,0,0,0,0,0,0,0,1])

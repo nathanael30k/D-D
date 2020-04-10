@@ -7,7 +7,8 @@ Created on Fri Jan 11 13:23:08 2019
 
 from joueur import *
 from time import sleep
-
+from dice import bernouilli
+from database import HobJason,HobJason2
 class Attaque:
     
     def __init__(self,arme, attaquant,defenseur):
@@ -35,7 +36,7 @@ class Attaque:
         bonus_degat = self.attaquant.bonus_dégat
         distrib_touche = bernouilli(self.p_touche())
         distrib_crit = ((self.arme.crit_mult-1)*bernouilli(self.arme.p_crit()))+1
-        return (distrib_crit*distrib_touche*(d10+bonus_degat).dice_distrib())
+        return (distrib_crit*distrib_touche*(self.arme.dé_arme+bonus_degat).dice_distrib())
     
     def roll(self):
         dégat = self.att_distrib().roll()
@@ -183,7 +184,7 @@ def stat(list_joueur,N):
     
     
 #duel([HobJason,HobJason2])
-N = 100
+N = 10
 stat([HobJason2,HobJason],N)
 #print(silent_duel([HobJason,Ogre]))
 #stat([HobJason,Ogre],N)
